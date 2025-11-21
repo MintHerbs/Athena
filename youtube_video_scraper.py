@@ -1,3 +1,4 @@
+from dotenv import load_dotenv  # used to read .env file where API key is stored
 import yaml          # used to read config.yml
 import csv           # used for writing results to CSV files
 import os            # used for file path handling
@@ -19,12 +20,17 @@ def process_video(video_snippet):
     return temp_dict
 
 
+# Load .env file first
+load_dotenv()
+
+# Read API key from environment (NOT from config.yml anymore)
+API_KEY = os.getenv("YOUTUBE_API_KEY")
+if not API_KEY:
+    raise ValueError("Missing YOUTUBE_API_KEY in environment or .env file.")
+
 # Opens and reads configuration settings from config.yml
 with open("config.yml", "r", encoding="utf-8") as f:
     config = yaml.safe_load(f)
-
-# Extract API key from configuration file
-API_KEY = config["API_KEY"]
 
 # URL for retrieving channel information (includes uploads playlist ID)
 CHANNELS_API_URL = "https://www.googleapis.com/youtube/v3/channels"
@@ -34,6 +40,7 @@ PLAYLIST_API_URL = "https://www.googleapis.com/youtube/v3/playlistItems"
 
 # Output folder for CSV files
 OUTPUT_FOLDER = config["output_folder"]
+os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
 # The set of fields that will appear as CSV columns
 OUTPUT_FIELDS = ["video_id", "title", "video_published_at"]

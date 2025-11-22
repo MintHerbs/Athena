@@ -6,24 +6,12 @@ from tqdm import tqdm # used for progress bars while scraping
 import requests      # used for calling YouTube API endpoints
 import time          # used for adding delays between API calls
 
-
-def process_video(video_snippet):
-    # Creates a dictionary containing selected video information
-    temp_dict = {}
-    # Extracts the YouTube video ID
-    temp_dict["video_id"] = video_snippet["resourceId"]["videoId"]
-    # Extracts the video title
-    temp_dict["title"] = video_snippet["title"]
-    # Extracts the publish date of the video
-    temp_dict["video_published_at"] = video_snippet["publishedAt"]
-    # Returns the cleaned and formatted video data
-    return temp_dict
-
+# --- CONFIGURATION & SETUP ---
 
 # Load .env file first
 load_dotenv()
 
-# Read API key from environment (NOT from config.yml anymore)
+# Read API key from environment
 API_KEY = os.getenv("YOUTUBE_API_KEY")
 if not API_KEY:
     raise ValueError("Missing YOUTUBE_API_KEY in environment or .env file.")
@@ -38,27 +26,79 @@ CHANNELS_API_URL = "https://www.googleapis.com/youtube/v3/channels"
 # URL for retrieving the videos inside a playlist (channel uploads)
 PLAYLIST_API_URL = "https://www.googleapis.com/youtube/v3/playlistItems"
 
+# URL for retrieving comments
+COMMENTS_API_URL = "https://www.googleapis.com/youtube/v3/commentThreads"
+
 # Output folder for CSV files
 OUTPUT_FOLDER = config["output_folder"]
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
 # The set of fields that will appear as CSV columns
-OUTPUT_FIELDS = ["video_id", "title", "video_published_at"]
+OUTPUT_FIELDS = ["video_id", "title", "comments"]
 
 # List of channel IDs provided in config.yml
 channel_ids = config["channel_ids"]
 
+# --- HELPER FUNCTION ---
+
+def process_video(video_snippet):
+    # Creates a dictionary containing selected video information
+    temp_dict = {}
+    
+    # Extracts the YouTube video ID
+    # We assign this to a variable first so we can use it in comment_params below
+    video_id = video_snippet["resourceId"]["videoId"]
+    temp_dict["video_id"] = video_id
+    
+    # Extracts the video title
+    temp_dict["title"] = video_snippet["title"]
+    
+    # 2. Fetch Comments for this specific video
+    comment_params = {
+        "key": API_KEY,
+        "part": "snippet",
+        "videoId": video_id, 
+        "maxResults": 100, # The max allowed per page
+        "textFormat": "plainText",
+        "order": "relevance" 
+    }
+
+    try:
+        # Make the API call
+        r = requests.get(COMMENTS_API_URL, params=comment_params).json()
+        
+        # Check if comments exist and extracting them
+        comment_list = []
+        if "items" in r:
+            for item in r["items"]:
+                # Extract the actual comment text
+                comment_text = item["snippet"]["topLevelComment"]["snippet"]["textDisplay"]
+                # Clean up newlines so they don't break the CSV format
+                clean_comment = comment_text.replace("\n", " ").replace("\r", "")
+                comment_list.append(clean_comment)
+        
+        # Join all 100 comments into one big string separated by a pipe symbol "|"
+        temp_dict["comments"] = " | ".join(comment_list)
+        
+    except Exception as e:
+        # This usually happens if comments are disabled on the video
+        temp_dict["comments"] = "COMMENTS_DISABLED_OR_ERROR"
+
+    return temp_dict
+
+# --- MAIN EXECUTION LOOP ---
+
 # Base parameters for the channels API call
 channels_params = {
-    "key": API_KEY,            # YouTube API key
-    "part": "contentDetails",  # We need contentDetails to get the uploads playlist ID
+    "key": API_KEY,            
+    "part": "contentDetails",  
 }
 
 # Base parameters for retrieving playlist items (videos)
 playlist_params = {
-    "key": API_KEY,      # API key again
-    "part": "snippet",   # snippet gives title and metadata
-    "maxResults": 50,    # maximum allowed per request by YouTube API
+    "key": API_KEY,      
+    "part": "snippet",   
+    "maxResults": 50,    
 }
 
 # Iterate over every channel ID in the config file
@@ -67,13 +107,17 @@ for channel_id in channel_ids:
     # Add or update the channel ID parameter in the request
     channels_params.update({"id": channel_id})
 
-    # Request channel data from YouTube, then parse JSON response
+    # Request channel data from YouTube
     r = requests.get(
         CHANNELS_API_URL,
         params=channels_params,
     ).json()
 
     # Extract the ID of the uploads playlist for this channel
+    if "items" not in r or not r["items"]:
+        print(f"Skipping channel ID {channel_id} (Not found or no items)")
+        continue
+        
     uploads_id = r["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
 
     # Insert the playlist ID into the playlist query parameters
@@ -101,10 +145,11 @@ for channel_id in channel_ids:
         pbar = tqdm(total=r["pageInfo"]["totalResults"])
 
         # Prepare CSV file for writing results
+        # *** FIX APPLIED HERE: encoding="utf-8-sig" ***
         with open(
             os.path.join(OUTPUT_FOLDER, f"{channel_name}.csv".replace(os.sep, "_")),
             "w",
-            encoding="utf-8",
+            encoding="utf-8-sig", 
         ) as f:
 
             # Create a CSV writer with the selected field names

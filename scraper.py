@@ -145,7 +145,6 @@ for channel_id in channel_ids:
         pbar = tqdm(total=r["pageInfo"]["totalResults"])
 
         # Prepare CSV file for writing results
-        # *** FIX APPLIED HERE: encoding="utf-8-sig" ***
         with open(
             os.path.join(OUTPUT_FOLDER, f"{channel_name}.csv".replace(os.sep, "_")),
             "w",

@@ -1,17 +1,38 @@
-#step 1 scrape
+import csv
+import os
+from scraper import run_scraper
+from gemini import run_gemini_processing
 
+def main():
+    # 1. Run the Scraper
+    # This grabs the data in memory (no CSV creation in this step)
+    print("Step 1: Fetching data from YouTube...")
+    raw_video_data = run_scraper()
+    
+    if not raw_video_data:
+        print("No data scraped. Exiting.")
+        return
 
-#step 2.1: comment validation
+    # 2. Run Gemini
+    # Pass the raw data directly to the Gemini module
+    print("Step 2: Sending data to Gemini for analysis...")
+    analyzed_data = run_gemini_processing(raw_video_data)
 
-#step 2.2: platform analysis
+    # 3. Save Final Output
+    # Now we save the final combined result to a CSV
+    output_filename = "final_analysis_results.csv"
+    
+    print(f"Step 3: Saving results to {output_filename}...")
+    
+    # Define the columns (Make sure these match the keys in your dictionaries)
+    fieldnames = ["video_id", "sentiment_flag", "emotional_genre", "sega_genre"]
+    
+    with open(output_filename, "w", newline="", encoding="utf-8-sig") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(analyzed_data)
 
-#step 3: download audio 
+    print("Done! Application finished successfully.")
 
-#step 4: extract lyrics 
-
-#step 5: train gemini
-
-
-first tabel: Video URL, Channel URL, Emotional Check , Multiplatform, gerne, emotional reaction, 
-
-second tabel: Video URL, Channel URL, lyrics generated
+if __name__ == "__main__":
+    main()

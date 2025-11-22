@@ -15,7 +15,8 @@ client = genai.Client(api_key=GEMINI_KEY)
 
 def analyze_single_video(video_id, title, comments):
     """
-    Sends a single video's data to Gemini for sentiment/genre analysis.
+    Sends a single video's data to Gemini for sentiment/genre analysis and 
+    confidence scoring.
     """
     prompt = f"""
     You are an expert cultural analyst of Mauritian Sega music.
@@ -26,14 +27,25 @@ def analyze_single_video(video_id, title, comments):
     Task:
     1. Read the comments. If >50% of the comments are about how the music made them feel, explaining their emotions, or sharing personal stories (as opposed to just "nice song" or visual comments), set 'sentiment_flag' to 1. Otherwise 0.
     2. Identify the specific 'emotional_genre' evoked (e.g., Happiness, Nostalgia, Depression, Party, Sadness).
-    3. Based on the Title, identify the 'sega_genre' (e.g., Political Sega, Chagos Sega, Fancy Sega, Roots Sega).
     
+    # --- ADJUSTMENTS START HERE ---
+    3. Based on the Video Title and comments:
+       a. If the content is clearly **not** Sega music (e.g., the language is irrelevant, the comments discuss non-Sega genres like Hip Hop or Rock, or the title implies unrelated content), set 'sega_genre' to **"Not Sega"**.
+       b. If the content is Sega music, you **must** pick one of the specific 'sega_genre' categories: **Political Sega, Chagos Sega, Fancy Sega, or Roots Sega**. Do NOT use "Unknown". Force a choice based on the best fit.
+       
+    # --- ADJUSTMENTS END HERE ---
+    
+    4. Assess the overall volume and detail of the provided comments. Set 'comment_density_rating' to one of three values: 'Low' (few, short, generic comments), 'Medium' (moderate volume, some detail), or 'High' (many, detailed, story-driven comments).
+    5. Provide a 'gemini_confidence_score' between 0.0 (low confidence) and 1.0 (high confidence) for the analysis, based on how clear and consistent the title and comments were in determining the genres.
+
     Return pure JSON format:
     {{
         "video_id": "{video_id}",
         "sentiment_flag": 0 or 1,
         "emotional_genre": "string",
-        "sega_genre": "string"
+        "sega_genre": "string",
+        "gemini_confidence_score": 0.0 to 1.0,
+        "comment_density_rating": "Low", "Medium", or "High"
     }}
     """
 
@@ -49,21 +61,27 @@ def analyze_single_video(video_id, title, comments):
         # Parse the JSON string
         data = json.loads(response.text)
 
-        # ---------------------------------------------------------
-        # THE FIX: Check if Gemini returned a list [ {...} ] 
-        # instead of a dict {...}
-        # ---------------------------------------------------------
+        # Handle case where Gemini returned a list [ {...} ] instead of a dict {...}
         if isinstance(data, list):
             if len(data) > 0:
-                return data[0] # Extract the dictionary from the list
+                return data[0]
+            # If list is empty, return error structure with new fields
             else:
-                return { # Handle empty list case
+                return { 
                     "video_id": video_id,
                     "sentiment_flag": 0,
                     "emotional_genre": "Error",
-                    "sega_genre": "Error"
+                    "sega_genre": "Not Sega", # Fallback for error handling
+                    "gemini_confidence_score": 0.0,
+                    "comment_density_rating": "Low"
                 }
         
+        # Check if the required keys exist before returning
+        if data.get("sega_genre") == "Unknown" or not data.get("sega_genre"):
+            # This is an extra safety check in case the model ignores the prompt
+            # If it still returns unknown, we force it to the most common default
+            data["sega_genre"] = "Roots Sega"
+            
         return data
 
     except Exception as e:
@@ -72,7 +90,9 @@ def analyze_single_video(video_id, title, comments):
             "video_id": video_id,
             "sentiment_flag": 0,
             "emotional_genre": "Error",
-            "sega_genre": "Error"
+            "sega_genre": "Not Sega", # Use "Not Sega" as the default genre for hard crashes
+            "gemini_confidence_score": 0.0,
+            "comment_density_rating": "Low"
         }
 
 def run_gemini_processing(scraped_data):

@@ -1,41 +1,51 @@
-﻿video_id,sentiment_flag,emotional_genre,sega_genre
-q3DgPXUmgcU,0,Happiness,Fancy Sega
-TX15VWntlms,1,Nostalgia,Roots Sega
-2AcEIBKk1tM,1,Gratitude,Roots Sega
-W5ttACkBnGo,1,Nostalgia,Roots Sega
-fMDFatY3Byg,1,Inspirational,Roots Sega
-PijCweVmwcA,1,Happiness,Fancy Sega
-k9To2vDsMF0,1,Nostalgia,Fancy Sega
-SwA-fz9QGvA,1,Nostalgia,Roots Sega
-7YHHK3ixt-M,1,Happiness,Roots Sega
-79IXNaklPdQ,1,Happiness,Roots Sega
-8lqoTDawpcU,1,Happiness,Fancy Sega
-2AaV-ZNgvfE,1,Happiness,Roots Sega
-zsM9BJ7l4GA,1,Nostalgia,Chagos Sega
-h9Av3XLPe6A,1,Nostalgia,Roots Sega
-8WsBDxfZ2jw,1,Happiness,Roots Sega
-C4ixS_Lp0lM,1,Sadness,Fancy Sega
-mfsONaMLbjY,1,Happiness,Unknown
-uPA75Z-s7lQ,1,Nostalgia,Roots Sega
-6YNK1iKyfIs,1,Nostalgia,Unknown
-0r1uwCy_mpM,1,Nostalgia,Unknown
-oveKgZTKEpY,1,Happiness,Unknown
-NZSzIiMP6QE,0,Happiness,Unknown
-F_YScrcew9c,1,Happiness,Unknown
-3QaEOLwvzQs,1,Happiness,None
-m1UQl8SHHkM,1,Nostalgia,Unknown
-GDXDP5MmZzY,1,Happiness,Unknown
-aWpwNJxVQ4Q,1,Happiness,Unknown
-Rynawg61xl4,1,Happiness,Unknown
-RbRrZ7OFT6o,1,Happiness,Unknown Sega
-0UV49yKVtqM,1,Nostalgia,Roots Sega
-WVphteKe5ik,1,Happiness,Fancy Sega
-717KuxqIhBc,1,Love,Fancy Sega
-kZ--IjzXbdA,1,Inspirational,Fancy Sega
-R1G-oNE9Nis,1,Inspiration,Roots Sega
--Z4MkHuEi5U,1,Happiness,Fancy Sega
-_8JEvjLXtUI,1,Happiness,Roots Sega
-hkY6rMcMak0,1,Happiness,Unknown
-TQzLJC3ZU5Y,1,Happiness,Unknown
-SHUuog95gY8,1,Happiness,Unknown
-zY0UhKFGxpU,1,Happiness,Fancy Sega
+﻿video_id,sentiment_flag,emotional_genre,sega_genre,gemini_confidence_score,comment_density_rating
+gPWMcTgUjtQ,1,Escapism,Not Sega,0.95,High
+9t6_hg-biFI,0,Unknown,Not Sega,0.7,Low
+GIeiSn42nj4,1,Inspiration,Not Sega,0.9,Low
+MQ0Rj6ZIZOM,1,Dreamy,Not Sega,0.9,Low
+f7WQ2s4LQhY,1,Happiness,Not Sega,0.9,Medium
+AzZZgrFQs50,1,Nostalgia,Not Sega,0.95,High
+OfBe-E2QMJo,1,Nostalgia,Not Sega,0.9,High
+#NAME?,1,Sadness,Not Sega,0.9,High
+FJXjOYec2aM,1,Melancholy,Not Sega,0.95,High
+41NsgsS4WDg,1,Peacefulness,Not Sega,0.9,Medium
+vzCpbwkYwi8,1,Hopefulness,Not Sega,1,High
+iHz3rEhOw2M,1,Melancholy,Not Sega,1,High
+MAXhSjhd8h0,1,Hope,Not Sega,0.95,High
+m7tuylk3vag,1,Ethereal,Not Sega,1,Medium
+yC81-joY7fg,1,Awe,Not Sega,1,Medium
+FIpBwLw0FHk,1,Melancholy,Not Sega,0.9,Medium
+9S9PYogxS4U,1,Hopefulness,Not Sega,1,High
+hnCtjIasmiw,1,Calmness,Not Sega,1,High
+S4KFZ6DumHo,1,Blessing,Not Sega,1,Medium
+q0h9ypbM2hI,1,Fantasy,Not Sega,1,High
+031NFdp7wSc,1,Epic,Not Sega,0.9,High
+i29ogpmpWoA,1,Happiness,Not Sega,0.9,Low
+9nwFdKBmKMY,0,Excitement,Not Sega,0.8,Medium
+akbzP0grDso,1,Nostalgia,Not Sega,1,High
+w5_XdWozIv0,1,Admiration,Not Sega,0.9,Medium
+WNFHMojxRvg,1,Admiration,Not Sega,0.9,Medium
+yQ3ErJgefRY,1,Inspirational,Not Sega,0.95,High
+PIwzIwGcZ2k,1,Admiration,Not Sega,0.9,High
+Y8FPjzIRSPc,1,Seductive,Not Sega,0.9,High
+HpN3NLf7-eU,1,Happiness,Not Sega,1,High
+_kb5oupvlpo,1,Happiness,Not Sega,0.9,Medium
+ycavmNm4__o,1,Hope,Not Sega,1,High
+y9BOkQH3RkI,1,Happiness,Fancy Sega,0.8,High
+OWPJCBHt71A,0,Nostalgia,Roots Sega,0.6,Medium
+3185RZdJJUU,0,Tranquility,Not Sega,0.8,Medium
+NKOkD5qpbYE,0,Neutral,Not Sega,0.9,Low
+LR5iKhglEes,0,Party,Roots Sega,0.7,Low
+5yKP65y7LqU,0,Happiness,Not Sega,0.8,Low
+bBANzNOqmaE,1,Uplifting,Not Sega,1,High
+EURIELLE - RUNAWAY TRAIN TO HEAVEN (Teaser Trailer),1,Awe,Not Sega,0.9,Medium
+ChBvbSzDEhA,1,Nostalgia,Not Sega,0.9,High
+9N1oZF7GUZY,1,Nostalgia,Not Sega,0.95,High
+yvS8ZOqW1jc,1,Romantic,Not Sega,1,High
+_XJDpD6dI4w,1,Love,Not Sega,0.9,Medium
+OdMB0KV_MWo,1,Empowerment,Not Sega,0.9,High
+PpgRWMCm3Eg,1,Excitement,Not Sega,0.9,High
+kyldUx9BX3Y,1,Empowerment,Not Sega,0.95,High
+l6Mt2LYUY5Q,1,Empowerment,Not Sega,0.95,High
+FUnovixKWZE,1,Sadness,Not Sega,1,High
+gyPkvIjqcJg,1,Angelic,Not Sega,1,High

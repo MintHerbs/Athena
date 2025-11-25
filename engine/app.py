@@ -1,77 +1,108 @@
-import yaml
-import os
-from engine.scraper import run_scraper
-from engine.gemini import run_gemini_processing
-from engine.multiplatform_analysis import run_multiplatform_analysis
+import concurrent.futures
+from tabulate import tabulate
+
+from scraper import run_scraper
+from gemini import run_gemini_processing
+from multiplatform_analysis import run_multiplatform_analysis
 from database import insert_analysis_results
 
-def load_config():
-    """Loads configuration settings from config.yml."""
-    try:
-        with open('config.yml', 'r') as file:
-            config = yaml.safe_load(file)
-        return config
-    except FileNotFoundError:
-        print("Error: config.yml not found.")
-        return None
 
-def merge_results(gemini_data, multiplatform_data):
+def merge_data(raw_data, gemini_data, multi_data):
     """
-    Merges the Gemini analysis (sentiment, genre) with the Multiplatform analysis (flags, scores) 
-    using 'video_id' as the key.
+    Merge raw scraper data, Gemini analysis, and multiplatform scores
+    into a single list of dictionaries based on video_id.
     """
-    merged_map = {item['video_id']: {} for item in gemini_data}
+    merged_list = []
 
-    # 1. Populate map with Gemini data (contains most of the required fields)
-    for item in gemini_data:
-        video_id = item['video_id']
-        merged_map[video_id].update(item)
-    
-    # 2. Merge Multiplatform data (contains new scores/flags)
-    for item in multiplatform_data:
-        video_id = item['video_id']
-        if video_id in merged_map:
-            # Multiplatform data includes: 
-            # normalized_score, streaming_platform_used, youtube_views, popularity_flag
-            merged_map[video_id].update(item)
-    
-    # Return the final list of merged dictionaries
-    final_list = list(merged_map.values())
-    print(f"Successfully merged {len(final_list)} video analysis records.")
-    return final_list
+    # Convert lists to dicts keyed by video_id for easy lookup
+    gemini_dict = {item["video_id"]: item for item in gemini_data}
+    multi_dict = {item["video_id"]: item for item in multi_data}
+
+    for video in raw_data:
+        vid_id = video["video_id"]
+        g_data = gemini_dict.get(vid_id, {})
+        m_data = multi_dict.get(vid_id, {})
+
+        merged_entry = {
+            **video,   # Scraper data
+            **g_data,  # Gemini data
+            **m_data,  # Multiplatform data
+        }
+        merged_list.append(merged_entry)
+
+    return merged_list
+
+
+def display_terminal_table(final_data):
+    """
+    Display data in the terminal as a formatted table.
+    """
+    table_data = []
+    headers = [
+        "Video URL",
+        "Channel URL",
+        "Sentiment Flag",
+        "Multiplatform Flag",
+        "Sega Genre",
+        "Emotional Genre",
+        "Comment Density",
+        "Gemini Conf.",
+    ]
+
+    for item in final_data:
+        row = [
+            item.get("video_url", "N/A"),
+            item.get("channel_url", "N/A"),
+            item.get("sentiment_flag", 0),
+            item.get("popularity_flag", 0),
+            item.get("sega_genre", "N/A"),
+            item.get("emotional_genre", "N/A"),
+            item.get("comment_density_rating", "N/A"),
+            item.get("gemini_confidence_score", 0.0),
+        ]
+        table_data.append(row)
+
+    print("\n" + "=" * 50)
+    print("FINAL ANALYSIS RESULTS")
+    print("=" * 50)
+    print(tabulate(table_data, headers=headers, tablefmt="grid"))
+
 
 def main():
-    config = load_config()
-    if not config:
-        return
-
-    # --- Step 1: Fetching Data from YouTube ---
+    # 1. Run the scraper
     print("Step 1: Fetching data from YouTube...")
-    raw_video_data = run_scraper(config.get("channel_ids", []), config.get("output_folder", "data"))
-    
+    raw_video_data = run_scraper()
+
     if not raw_video_data:
-        print("No data scraped. Exiting application.")
+        print("No data scraped. Exiting.")
         return
 
-    # --- Step 2: Running Gemini Analysis (Sentiment, Genre) ---
-    print("\nStep 2: Running Gemini Analysis...")
-    gemini_analysis_results = run_gemini_processing(raw_video_data)
+    # 2. Run Gemini and multiplatform analysis in parallel
+    print("\nStep 2: Launching Parallel Processes (Gemini and Multiplatform)...")
 
-    # --- Step 3: Running Multiplatform Analysis (Popularity Score) ---
-    print("\nStep 3: Running Multiplatform Analysis...")
-    multiplatform_analysis_results = run_multiplatform_analysis(raw_video_data)
-    
-    # --- Step 4: Merge Results ---
-    print("\nStep 4: Merging all analysis results...")
-    final_merged_data = merge_results(gemini_analysis_results, multiplatform_analysis_results)
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        future_gemini = executor.submit(run_gemini_processing, raw_video_data)
+        future_multi = executor.submit(run_multiplatform_analysis, raw_video_data)
 
-    # --- Step 5: Database Insertion (Supabase) ---
-    print("\nStep 5: Inserting data into Supabase...")
-    inserted_count = insert_analysis_results(final_merged_data)
-    
-    print(f"\n--- Process Complete ---")
-    print(f"Total records analyzed: {len(final_merged_data)}")
-    print(f"Total records inserted into Supabase: {inserted_count}")
+        gemini_results = future_gemini.result()
+        multiplatform_results = future_multi.result()
+
+    # 3. Merge results
+    print("\nStep 3: Merging Data...")
+    final_analyzed_data = merge_data(raw_video_data, gemini_results, multiplatform_results)
+
+    # 4. Display summary table
+    display_terminal_table(final_analyzed_data)
+
+    # 5. Save to Supabase
+    print("\nStep 4: Saving results to Supabase...")
+    inserted_count = insert_analysis_results(final_analyzed_data)
+
+    if inserted_count > 0:
+        print(f"Done. {inserted_count} records saved to Supabase.")
+    else:
+        print("Application finished, but no records were saved.")
+
 
 if __name__ == "__main__":
     main()

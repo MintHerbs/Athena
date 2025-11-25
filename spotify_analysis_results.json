@@ -1,0 +1,38 @@
+[
+    {
+        "youtube_video_id": "iHz3rEhOw2M",
+        "youtube_title": "WE ALL FALL DOWN - Michael Maas & Eurielle",
+        "youtube_channel_name": "EURIELLE",
+        "spotify_data": {
+            "spotify_id": "6iUk1XtDEp3W4eSpmoQ0IT",
+            "name": "We All Fall Down",
+            "artist": "Michael Maas",
+            "popularity": 14,
+            "link": "https://open.spotify.com/track/6iUk1XtDEp3W4eSpmoQ0IT"
+        }
+    },
+    {
+        "youtube_video_id": "MAXhSjhd8h0",
+        "youtube_title": "AMAIA (All You Are) - Fernando Velázquez ft. Eurielle & Euskadiko Orkestra",
+        "youtube_channel_name": "EURIELLE",
+        "spotify_data": {
+            "spotify_id": "5JzX48pDTQ3QXkWb5YmkPi",
+            "name": "Amaia (All You Are) [feat. Eurielle]",
+            "artist": "Fernando Velázquez",
+            "popularity": 4,
+            "link": "https://open.spotify.com/track/5JzX48pDTQ3QXkWb5YmkPi"
+        }
+    },
+    {
+        "youtube_video_id": "FIpBwLw0FHk",
+        "youtube_title": "LAINOTIK (From the mist) - Fernando Velázquez ft. Eurielle & Euskadiko Orkestra",
+        "youtube_channel_name": "EURIELLE",
+        "spotify_data": {
+            "spotify_id": "7trRjJ6qvT32cI3flektUd",
+            "name": "Lainotik (From The Mist) [feat. Eurielle, Kup Taldea]",
+            "artist": "Fernando Velázquez",
+            "popularity": 4,
+            "link": "https://open.spotify.com/track/7trRjJ6qvT32cI3flektUd"
+        }
+    }
+]

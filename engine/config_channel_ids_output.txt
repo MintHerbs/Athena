@@ -1,0 +1,4 @@
+channel_ids:
+  - UC8JXuzAhwwujdqSmcok-L7w # UC8JXuzAhwwujdqSmcok-L7w
+  - UCmCnw2uYIjCKXwu3ma1NABQ # UCmCnw2uYIjCKXwu3ma1NABQ
+  - UCVPwYIajJq5QkJ3zXr0t0WQ # UCVPwYIajJq5QkJ3zXr0t0WQ

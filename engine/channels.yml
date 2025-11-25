@@ -1,0 +1,25 @@
+# List all your YouTube channel URLs here.
+# The script will convert them into their unique Channel IDs (UC...).
+#
+# Supported formats:
+# - Custom URL (e.g., @ChannelName)
+# - Standard URL (e.g., /channel/UC...)
+# - Legacy User URL (e.g., /user/Username)
+
+channels:
+  - https://www.youtube.com/@segamp3
+  - https://www.youtube.com/channel/UC8JXuzAhwwujdqSmcok-L7w
+  - https://www.youtube.com/@RideOnRecords
+  - https://www.youtube.com/@rn019
+  - https://www.youtube.com/channel/UCmCnw2uYIjCKXwu3ma1NABQ
+  - https://www.youtube.com/@clarelarmelle3267
+  - https://www.youtube.com/@JerryNTheResistance
+  - https://www.youtube.com/@DamienElisa
+  - https://www.youtube.com/@lanikitaofficiel7147
+  - https://www.youtube.com/@jasonheerah
+  - https://www.youtube.com/@Warrenpermal
+  - https://www.youtube.com/@seganouzanset2450
+  - https://www.youtube.com/channel/UCVPwYIajJq5QkJ3zXr0t0WQ
+  - https://www.youtube.com/@CASSIYADESIREFRANCOIS
+  - https://www.youtube.com/@segatunes
+  - https://www.youtube.com/@Segamauritius

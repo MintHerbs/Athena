@@ -1,8 +1,19 @@
 import math
 import time
 import concurrent.futures # --- Added for parallelism
-from spotify import run_spotify_analysis
-from deezer import run_deezer_analysis 
+# Assuming these modules exist and return lists of dictionaries
+# from engine.spotify import run_spotify_analysis 
+# from engine.deezer import run_deezer_analysis 
+
+# Placeholder functions for demonstration since the actual files were not provided
+def run_spotify_analysis(raw_video_data):
+    # This would contain Spotify API logic
+    return [{"youtube_video_id": v["video_id"], "spotify_data": {"popularity": 50}} for v in raw_video_data]
+
+def run_deezer_analysis(raw_video_data):
+    # This would contain Deezer API logic
+    return [{"youtube_video_id": v["video_id"], "deezer_data": {"rank": 100000}} for v in raw_video_data]
+# End of Placeholder functions
 
 def calculate_popularity_score(youtube_views, streaming_count):
     try:
@@ -11,6 +22,7 @@ def calculate_popularity_score(youtube_views, streaming_count):
     except ValueError:
         return 0.0
 
+    # Avoid division by zero and handle edge cases
     if views == 0 and streams == 0:
         return 1.0 
     if views == 0 or streams == 0:
@@ -35,7 +47,7 @@ def get_best_streaming_count(spotify_data, deezer_data):
 
 def process_single_video_popularity(video, spotify_results, deezer_results):
     video_id = video["video_id"]
-    youtube_views = video.get("views", "0")
+    youtube_views = video.get("views", "0") # <-- Data point 1 (NEW)
 
     spotify_match = next((item for item in spotify_results if item['youtube_video_id'] == video_id), None)
     deezer_match = next((item for item in deezer_results if item['youtube_video_id'] == video_id), None)
@@ -44,14 +56,14 @@ def process_single_video_popularity(video, spotify_results, deezer_results):
     deezer_data = deezer_match['deezer_data'] if deezer_match else {}
 
     best_streams, platform_used = get_best_streaming_count(spotify_data, deezer_data)
-    normalized_score = calculate_popularity_score(youtube_views, best_streams)
+    normalized_score = calculate_popularity_score(youtube_views, best_streams) # <-- Data point 2 (NEW)
     final_score_flag = 1 if normalized_score >= 0.5 else 0
     
     return {
         "video_id": video_id,
         "youtube_views": youtube_views,
         "streaming_count_used": best_streams,
-        "streaming_platform_used": platform_used,
+        "streaming_platform_used": platform_used, # <-- Data point 3 (NEW)
         "normalized_score": round(normalized_score, 4),
         "popularity_flag": final_score_flag
     }
@@ -76,7 +88,8 @@ def run_multiplatform_analysis(raw_video_data):
     final_popularity_data = []
     print("\nCalculating Final Popularity Scores...")
     for video in raw_video_data:
-        score_data = process_single_video_popularity(video, spotify_results, deezer_results)
+        # This function returns all the required data points
+        score_data = process_single_video_popularity(video, spotify_results, deezer_results) 
         final_popularity_data.append(score_data)
 
     print(f"Calculated scores for {len(final_popularity_data)} videos.")
